@@ -1,2 +1,7 @@
 setuptools==60.9.3
 streamlit>=1.10.0
+uvicorn
+fastapi
+mimetypes
+toml
+glob
