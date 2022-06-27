@@ -127,46 +127,63 @@ def _set_media_filter_cb():
 
 # --------------------------------------------------------------------------------
 
-c1, c2, c3 = st.sidebar.columns([3,3,2])
-c1.image('./images/app_logo.png')
-c2.write('&nbsp;')
-c2.image('./images/a12i_logo_grey.png')
+def main():
+    c1, c2, c3 = st.sidebar.columns([3,3,2])
+    c1.image('./images/app_logo.png')
+    c2.write('&nbsp;')
+    c2.image('./images/a12i_logo_grey.png')
 
-st.sidebar.subheader('Settings')
+    st.sidebar.subheader('Settings')
 
-with st.sidebar:
-    with st.form(key='media_selection_form', clear_on_submit=False):
-        state.MEDIA_SOURCE = st.selectbox(
-            '✨ Select media source', 
-            options=list(state.MEDIA_SOURCES.keys()),
-            key='media_source'
+    with st.sidebar:
+        with st.form(key='media_selection_form', clear_on_submit=False):
+            state.MEDIA_SOURCE = st.selectbox(
+                '✨ Select media source', 
+                options=list(state.MEDIA_SOURCES.keys()),
+                key='media_source'
+            )
+            if st.form_submit_button('Apply', on_click=_set_media_source_cb):
+                st.experimental_rerun()
+
+        with st.form(key='media_filter_form', clear_on_submit=False):
+            state.MEDIA_FILTER = st.text_input('🔎 Filter media', state.MEDIA_FILTER, key='media_filter')
+            if st.form_submit_button('Apply', on_click=_set_media_filter_cb):
+                st.experimental_rerun()
+
+    num_cols = int(st.sidebar.number_input('Number columns', 1, 7, 5, 1))
+    img_w = int(st.sidebar.number_input('Image width', 50, 2000, 400, 10))
+    max_images = int(st.sidebar.number_input('Max images', 10, 2000, 1000, 100))
+
+    with st.sidebar.expander('⚙️ Media server'):
+        st.button(
+            '🌀 Restart',
+            help='Be sure you really want to do this!',
+            on_click=_restart_media_server_cb,
         )
-        if st.form_submit_button('Apply', on_click=_set_media_source_cb):
-            st.experimental_rerun()
 
-    with st.form(key='media_filter_form', clear_on_submit=False):
-        state.MEDIA_FILTER = st.text_input('🔎 Filter media', state.MEDIA_FILTER, key='media_filter')
-        if st.form_submit_button('Apply', on_click=_set_media_filter_cb):
-            st.experimental_rerun()
+    media_list, _media_filter = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER)
+    base_url = f'{BASE_URL}/media/{state.MEDIA_SOURCE}/' if not 'http' in media_list[0] else ''
+    images = {f'{base_url}{media}': media for media in media_list[:max_images]}
 
-num_cols = int(st.sidebar.number_input('Number columns', 1, 7, 5, 1))
-img_w = int(st.sidebar.number_input('Image width', 50, 2000, 400, 10))
-max_images = int(st.sidebar.number_input('Max images', 10, 2000, 1000, 100))
+    cols = cycle(st.columns(num_cols))
+    for img, caption in images.items():
+        try:
+            next(cols).image(img, width=img_w, output_format='auto', caption=caption)
+        except:
+            pass
 
-with st.sidebar.expander('⚙️ Media server'):
-    st.button(
-        '🌀 Restart',
-        help='Be sure you really want to do this!',
-        on_click=_restart_media_server_cb,
-    )
+# -----------------------------------------------------------------------------
 
-media_list, _media_filter = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER)
-base_url = f'{BASE_URL}/media/{state.MEDIA_SOURCE}/' if not 'http' in media_list[0] else ''
-images = {f'{base_url}{media}': media for media in media_list[:max_images]}
+def about():
+    st.sidebar.markdown('---')
+    st.sidebar.info('''
+        (c) 2022. CloudOpti Ltd. All rights reserved.
+        
+        [GitHub repo](https://github.com/asehmi/st-media-server)
+    ''')
 
-cols = cycle(st.columns(num_cols))
-for img, caption in images.items():
-    try:
-        next(cols).image(img, width=img_w, output_format='auto', caption=caption)
-    except:
-        pass
+# -----------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    main()
+    about()
