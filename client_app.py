@@ -42,7 +42,7 @@ if 'MEDIA_LIST_SORT' not in state:
 
 # --------------------------------------------------------------------------------
 
-MEDIA_SERVER_HOST = st.secrets['MEDIA_SERVER_HOST']
+MEDIA_SERVER_HOST = st.secrets['MEDIA_SERVER_CLOUD_HOST'] if st.secrets['RELEASE'] else st.secrets['MEDIA_SERVER_LOCAL_HOST']
 MEDIA_SERVER_PORT = st.secrets['MEDIA_SERVER_PORT']
 BASE_URL = f'http://{MEDIA_SERVER_HOST}:{MEDIA_SERVER_PORT}'
 

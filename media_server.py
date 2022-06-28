@@ -9,15 +9,21 @@ from mimetypes import guess_type
 import toml
 import glob
 
+# Can't use st.secrets as this isn't a Streamlit app
+# (But I want to access the secret used by the Streamlit client during cloud deployment)
+secrets = toml.load('./.streamlit/secrets.toml')
+RELEASE = secrets['RELEASE']
+
 if os.path.isfile('media_server.toml'):
     server_settings = toml.load('media_server.toml')
 else:
     server_settings = toml.load('media_server.example.toml')
 
 MEDIA_SOURCES, MEDIA_TYPES = server_settings['MEDIA_SOURCES'], server_settings['MEDIA_TYPES']
-HOST, PORT = server_settings['HOST'], server_settings['PORT']
+HOST = server_settings['CLOUD_HOST'] if RELEASE else server_settings['LOCAL_HOST']
+PORT = server_settings['PORT']
 
-CORS_ALLOW_ORIGINS = ['http://localhost, http://localhost:4010, http://localhost:8765']
+CORS_ALLOW_ORIGINS = ['http://{HOST}, https://{HOST}, http://localhost, http://localhost:4010, http://localhost:8765']
 
 def _rename_file_with_prefix(source: str, media_file: str, prefix: str):
     media_source = MEDIA_SOURCES[source]
