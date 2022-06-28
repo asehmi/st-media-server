@@ -61,7 +61,11 @@ def launch_media_server():
         proc.wait()
         return proc
 
-    job = ['python', 'media_server.py', MEDIA_SERVER_HOST, str(MEDIA_SERVER_PORT)]
+    # Can use either of these job specs below. For Streamlit cloud I'm trying to run
+    # uvicorn directly to avoid importing uvicorn in media_server.py which fails!
+
+    # job = ['python', 'media_server.py', MEDIA_SERVER_HOST, str(MEDIA_SERVER_PORT)]
+    job = ['uvicorn', 'media_server:app', '--host', MEDIA_SERVER_HOST, '--port', str(MEDIA_SERVER_PORT)]
 
     # server thread will remain active as long as streamlit thread is running, or is manually shutdown
     thread = threading.Thread(name='Media Server', target=_run, args=(job,), daemon=False)
@@ -176,7 +180,7 @@ def main():
             on_click=_restart_media_server_cb,
         )
 
-    media_list, _media_filter = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER, sort=state.MEDIA_LIST_SORTED)
+    media_list, _media_filter = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER, sort=state.MEDIA_LIST_SORT)
     base_url = f'{BASE_URL}/media/{state.MEDIA_SOURCE}/' if not 'http' in media_list[0] else ''
     images = {f'{base_url}{media}': media for media in media_list[:max_images]}
 

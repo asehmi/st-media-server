@@ -1,8 +1,6 @@
 import os
 import sys
 from xmlrpc.client import Boolean
-import uvicorn
-print('DEBUG: Uvicorn imported!!')
 from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse, Response
@@ -166,9 +164,19 @@ class MediaServerAPI_Wrapper(FastAPI):
 """
 Simple bootstrapper intended to be used used to start the API as a daemon process
 """
+app = MediaServerAPI_Wrapper()
+
+# Wrapping uvicorn import in try/except as have issues in Streamlit cloud
+# The test client application runs uvicorn directly with media_server:app
 def start(host=HOST, port=PORT):
-    app = MediaServerAPI_Wrapper()
-    uvicorn.run(app, host=host, port=port)
+    try:
+        import uvicorn
+        uvicorn.run(app, host=host, port=port)
+    except Exception as msg:
+        print('EXCEPTION ecountered running uvicorn!')
+        print(str(msg))
+        print('Try running the app from command line:\n')
+        print(f'   $ uvicorn media_server:app --host {host} --port {port}\n')
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
