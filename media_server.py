@@ -1,6 +1,8 @@
 import os
 import sys
+from xmlrpc.client import Boolean
 import uvicorn
+print('DEBUG: Uvicorn imported!!')
 from typing import Union
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse, Response
@@ -114,8 +116,9 @@ class MediaServerAPI_Wrapper(FastAPI):
                 status_code=200
             )
 
+        # TODO: https://thispointer.com/python-get-list-of-files-in-directory-sorted-by-date-and-time/
         @self.get("/media_list/{source}")
-        async def media_list(source: str, filter: Union[str, None] = None):
+        async def media_list(source: str, filter: Union[str, None] = None, sort: bool = False):
 
             source = source.replace('(', '').replace(')', '').replace('"', '').strip()
 
@@ -129,7 +132,7 @@ class MediaServerAPI_Wrapper(FastAPI):
                         file_extension = media_type.split('/')[-1]
                         media_type_files = [url.replace(f'{media_folder}\\','') for url in glob.glob(f'{media_folder}/*.{file_extension}')]
                         media_files.extend(media_type_files)
-                    media_files = sorted(media_files)
+                    media_files = sorted(media_files) if sort else media_files
                 elif media_source.get('media_links', None):
                     media_files = media_source['media_links']
 

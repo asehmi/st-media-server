@@ -1,1 +1,1 @@
-uvicorn
+uvicorn[standard]==0.17.6

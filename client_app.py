@@ -36,6 +36,8 @@ if 'MEDIA_FILTER' not in state:
     state.MEDIA_FILTER = None
 if 'MEDIA_LIST' not in state:
     state.MEDIA_LIST = []
+if 'MEDIA_LIST_SORT' not in state:
+    state.MEDIA_LIST_SORT = False
 
 # --------------------------------------------------------------------------------
 
@@ -80,9 +82,11 @@ def get_media_sources():
     return json.loads(requests.get(f'{BASE_URL}/media_sources').text)['media_sources']
 
 @st.experimental_memo()
-def get_media_list(media_source='DEFAULT', media_filter=None):
-    filter  = f'?filter={media_filter}' if media_filter else ''
-    media_list_resp = json.loads(requests.get(f'{BASE_URL}/media_list/{media_source}{filter}').text)
+def get_media_list(media_source='DEFAULT', media_filter=None, sort=False):
+    filter_param  = f'filter={media_filter}' if media_filter else ''
+    sort_param  = f'sort={sort}'
+    params = f'?{filter_param}&{sort_param}' if filter_param else f'?{sort_param}'
+    media_list_resp = json.loads(requests.get(f'{BASE_URL}/media_list/{media_source}{params}').text)
     media_list = media_list_resp['media_list']
     media_filter = media_list_resp['media_filter']
     return media_list, media_filter
@@ -91,7 +95,7 @@ def initialize_media_resources():
     state.MEDIA_SOURCES = get_media_sources()
     if state.MEDIA_SOURCES:
         state.MEDIA_SOURCE = list(state.MEDIA_SOURCES.keys())[0]
-        state.MEDIA_LIST, state.MEDIA_FILTER = get_media_list(media_source=state.MEDIA_SOURCE)
+        state.MEDIA_LIST, state.MEDIA_FILTER = get_media_list(media_source=state.MEDIA_SOURCE, sort=state.MEDIA_LIST_SORT)
 
 if state.MEDIA_SERVER_STARTED and (not state.MEDIA_SOURCE):
     initialize_media_resources()
@@ -118,12 +122,22 @@ def _restart_media_server_cb():
 def _set_media_source_cb():
     state.MEDIA_SOURCE = state['media_source']
     state.MEDIA_FILTER = None
-    state.MEDIA_LIST, state.MEDIA_FILTER = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER)
+    state.MEDIA_LIST_SORT = False
+    state.MEDIA_LIST, state.MEDIA_FILTER = get_media_list(
+        media_source=state.MEDIA_SOURCE, 
+        media_filter=state.MEDIA_FILTER, 
+        sort=state.MEDIA_LIST_SORT
+    )
 
 def _set_media_filter_cb():
     state.MEDIA_SOURCE = state['media_source']
     state.MEDIA_FILTER = state['media_filter']
-    state.MEDIA_LIST, state.MEDIA_FILTER = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER)
+    state.MEDIA_LIST_SORT = state['media_list_sort']
+    state.MEDIA_LIST, state.MEDIA_FILTER = get_media_list(
+        media_source=state.MEDIA_SOURCE, 
+        media_filter=state.MEDIA_FILTER, 
+        sort=state.MEDIA_LIST_SORT
+    )
 
 # --------------------------------------------------------------------------------
 
@@ -147,11 +161,12 @@ def main():
 
         with st.form(key='media_filter_form', clear_on_submit=False):
             state.MEDIA_FILTER = st.text_input('🔎 Filter media', state.MEDIA_FILTER, key='media_filter')
+            state.MEDIA_LIST_SORT = st.checkbox('Sorted', state.MEDIA_LIST_SORT, key='media_list_sort')
             if st.form_submit_button('Apply', on_click=_set_media_filter_cb):
                 st.experimental_rerun()
 
-    num_cols = int(st.sidebar.number_input('Number columns', 1, 7, 5, 1))
-    img_w = int(st.sidebar.number_input('Image width', 50, 2000, 400, 10))
+    num_cols = int(st.sidebar.number_input('Number columns', 1, 12, 5, 1))
+    img_w = int(st.sidebar.number_input('Image width', 50, 2000, 450, 10))
     max_images = int(st.sidebar.number_input('Max images', 10, 2000, 1000, 100))
 
     with st.sidebar.expander('⚙️ Media server'):
@@ -161,16 +176,14 @@ def main():
             on_click=_restart_media_server_cb,
         )
 
-    media_list, _media_filter = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER)
+    media_list, _media_filter = get_media_list(media_source=state.MEDIA_SOURCE, media_filter=state.MEDIA_FILTER, sort=state.MEDIA_LIST_SORTED)
     base_url = f'{BASE_URL}/media/{state.MEDIA_SOURCE}/' if not 'http' in media_list[0] else ''
     images = {f'{base_url}{media}': media for media in media_list[:max_images]}
 
     cols = cycle(st.columns(num_cols))
     for img, caption in images.items():
-        try:
-            next(cols).image(img, width=img_w, output_format='auto', caption=caption)
-        except:
-            pass
+        # next(cols).image(img, width=img_w, output_format='auto', caption=caption)
+        next(cols).image(img, width=img_w, output_format='auto')
 
 # -----------------------------------------------------------------------------
 
