@@ -18,7 +18,11 @@ This Streamlit app renders an image grid from images served from a simple `FastA
 
 ### Try the demo app yourself
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://asehmi-st-media-server-client-app-epkzvu.streamlitapp.com/)
+(_**WORK IN PROGRESS**_: [28 June 2022] Trying to get FastAPI to run in Streamlit Cloud. Clone the repo and run it locally for now.)
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](#)
+
+<!-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://asehmi-st-media-server-client-app-epkzvu.streamlitapp.com/) -->
 
 ## Installation
 
