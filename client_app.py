@@ -1,8 +1,9 @@
-from itertools import cycle
+import sys
 import requests
 import json
 import time
 import base64
+from itertools import cycle
 
 import streamlit as st
 
@@ -61,11 +62,14 @@ def launch_media_server():
         proc.wait()
         return proc
 
-    # Can use either of these job specs below. For Streamlit cloud I'm trying to run
-    # uvicorn directly to avoid importing uvicorn in media_server.py which fails!
+    # Can use either of these job specs below
 
-    # job = ['python', 'media_server.py', MEDIA_SERVER_HOST, str(MEDIA_SERVER_PORT)]
-    job = ['uvicorn', 'media_server:app', '--host', MEDIA_SERVER_HOST, '--port', str(MEDIA_SERVER_PORT)]
+    # [1] sys.executable ensures we use the same Python environment that Streamlit is running under
+    job = [f'{sys.executable}', 'media_server.py', MEDIA_SERVER_HOST, str(MEDIA_SERVER_PORT)]
+
+    # [2] For Streamlit cloud I'm trying to run uvicorn directly to avoid importing uvicorn
+    # in media_server.py which seemed to fail!
+    # job = ['uvicorn', 'media_server:app', '--host', MEDIA_SERVER_HOST, '--port', str(MEDIA_SERVER_PORT)]
 
     # server thread will remain active as long as streamlit thread is running, or is manually shutdown
     thread = threading.Thread(name='Media Server', target=_run, args=(job,), daemon=False)
