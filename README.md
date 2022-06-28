@@ -18,7 +18,7 @@ This Streamlit app renders an image grid from images served from a simple `FastA
 
 ### Try the demo app yourself
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/asehmi/streamlit-label-studio-frontend/app.py)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://asehmi-st-media-server-client-app-epkzvu.streamlitapp.com/)
 
 ## Installation
 
