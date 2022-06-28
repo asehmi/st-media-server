@@ -1,3 +1,1 @@
 uvicorn
-starlette
-fast-api
