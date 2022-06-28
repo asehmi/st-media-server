@@ -1,7 +1,14 @@
-debugpy==1.4.1
-fastapi
-psutil==5.8.0
-requests>=2.27.1
-streamlit==1.10.0
-toml==0.10.2
-uvicorn[standard]==0.17.6
+name: base
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - debugpy=1.4.1=py39hd77b12b_0
+  - psutil=5.8.0=py39h2bbff1b_1
+  - toml=0.10.2=pyhd3eb1b0_0
+  - pip:
+    - fastapi==0.75.0
+    - requests==2.27.1
+    - streamlit==1.10.0
+    - uvicorn==0.17.6
+prefix: .
