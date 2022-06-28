@@ -1,1 +1,1 @@
-uvicorn[standard]
+uvicorn
