@@ -1,6 +1,6 @@
 media_server.toml
-Procfile
-setup.sh
+# Procfile
+# setup.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
