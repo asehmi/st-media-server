@@ -1,7 +1,9 @@
 # Singular values come above the key group values below to prevent them combining
 
 # Assign the cloud host AFTER you know the deployment URL
-CLOUD_HOST = 'asehmi-st-media-server-client-app-KEY.herokuapp.com'
+# ( Can be '<user-repo-app-key>.herokuapp.com' too, if you configure
+#   'Procfile' and 'setup.sh', and separate the frontend and backend deployments )
+CLOUD_HOST = '<user-repo-app-key>.streamlit.com'
 LOCAL_HOST = 'localhost'
 
 PORT = 8888

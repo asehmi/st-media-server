@@ -50,13 +50,33 @@ Configure the server `CLOUD_HOST`, `LOCAL_HOST` and `PORT` in the server `toml` 
 **.streamlit/secrets.toml**
 
 ```bash
-# Set release to false for local machine deployments
-RELEASE = true
+# Set remote cloud hosted key to false for local machine deployments
+REMOTE_CLOUD_HOSTED = false
 
 # Assign the cloud media server host AFTER you know the deployment URL via management console
+# ( Can be '<user-repo-app-key>.herokuapp.com' too, if you configure
+#   'Procfile' and 'setup.sh', and separate the frontend and backend deployments )
 MEDIA_SERVER_CLOUD_HOST = '<user-repo-app-key>.streamlitapp.com'
 MEDIA_SERVER_LOCAL_HOST = 'localhost'
 MEDIA_SERVER_PORT = 8888
+
+MAX_NUM_IMAGES = 3000
+DEFAULT_NUM_IMAGES = 1000
+
+# presets = Number of columns, Pixel width presets
+# default_index = index of default to start with
+[DISPLAY_PRESETS]
+presets = [
+    '1, 2560',
+    '2, 1280',
+    '3, 850',
+    '4, 640',
+    '5, 512',
+    '10, 256',
+    '20, 128',
+    '40, 64'
+]
+default_index = 4
 ```
 
 **media_server.toml**
@@ -65,6 +85,8 @@ MEDIA_SERVER_PORT = 8888
 # Singular values come above the key group values below to prevent them combining
 
 # Assign the cloud host AFTER you know the deployment URL
+# ( Can be '<user-repo-app-key>.herokuapp.com' too, if you configure
+#   'Procfile' and 'setup.sh', and separate the frontend and backend deployments )
 CLOUD_HOST = '<user-repo-app-key>.streamlitapp.com'
 LOCAL_HOST = 'localhost'
 
@@ -77,9 +99,13 @@ MEDIA_TYPES = [
     'image/gif',
 ]
 
-[MEDIA_SOURCES.LOCAL]
+[MEDIA_SOURCES.'LOCAL 1']
 media_folder = './images'
 media_filter = 'unsplash'
+
+[MEDIA_SOURCES.'LOCAL 2']
+media_folder = './images'
+media_filter = 'wallpaper'
 
 [MEDIA_SOURCES.LINKS]
 media_links = [
