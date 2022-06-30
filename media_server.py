@@ -225,7 +225,8 @@ app = MediaServerAPI_Wrapper()
 def start(host=HOST, port=PORT):
     try:
         import uvicorn
-        uvicorn.run(app, host=host, port=port)
+        from pathlib import Path
+        uvicorn.run(f'{Path(__file__).stem}:app', host=host, port=port, workers=2, reload=True)
     except Exception as msg:
         print('EXCEPTION ecountered running uvicorn!')
         print(str(msg))
