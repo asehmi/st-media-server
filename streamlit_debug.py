@@ -65,7 +65,7 @@ def set(flag: bool=False, wait_for_client=False, host='localhost', port=8765):
             logging.info(f'>>> Remote debugging activated (host={host}, port={port}) <<<')
         
         if not _DEBUG:
-            logging.info(f'>>> Remote debugging in NOT active <<<')
+            # logging.info(f'>>> Remote debugging in NOT active <<<')
             st.session_state.debugging = False
     except:
         # Ignore... e.g. for cloud deployments

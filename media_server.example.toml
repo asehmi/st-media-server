@@ -1,7 +1,7 @@
 # Singular values come above the key group values below to prevent them combining
 
 # Assign the cloud host AFTER you know the deployment URL
-CLOUD_HOST = 'asehmi-st-media-server-client-app-KEY.streamlitapp.com'
+CLOUD_HOST = 'asehmi-st-media-server-client-app-KEY.herokuapp.com'
 LOCAL_HOST = 'localhost'
 
 PORT = 8888
@@ -13,9 +13,13 @@ MEDIA_TYPES = [
     'image/gif',
 ]
 
-[MEDIA_SOURCES.LOCAL]
+[MEDIA_SOURCES.'LOCAL 1']
 media_folder = './images'
 media_filter = 'unsplash'
+
+[MEDIA_SOURCES.'LOCAL 2']
+media_folder = './images'
+media_filter = 'wallpaper'
 
 [MEDIA_SOURCES.LINKS]
 media_links = [

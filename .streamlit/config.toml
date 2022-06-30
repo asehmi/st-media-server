@@ -3,7 +3,7 @@
 backgroundColor = "black"
 secondaryBackgroundColor = "black"
 textColor = "#DCDCDC"
-font = "sans serif"
+font = "monospace"
 
 [runner]
 fastReruns = false

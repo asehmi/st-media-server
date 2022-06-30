@@ -1,12 +1,12 @@
-# FastAPI media server and stream client app example
+# FastAPI media server and Streamlit client app example
 
-    date: "2022-06-27"
+    date: "2022-06-30"
     author:
         name: "Arvindra Sehmi"
         url: "https://www.linkedin.com/in/asehmi/"
         mail: "vin [at] thesehmis.com"
         avatar: "https://twitter.com/asehmi/profile_image?size=original"
-    related: N/A
+    related: https://github.com/asehmi/st-media-service is a similar pure Streamlit version of this application
 
 ## Overview
 

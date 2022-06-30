@@ -7,11 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from mimetypes import guess_type
 import toml
 import glob
+import base64
 
 # Can't use st.secrets as this isn't a Streamlit app
 # (But I want to access the secret used by the Streamlit client during cloud deployment)
 secrets = toml.load('./.streamlit/secrets.toml')
-RELEASE = secrets['RELEASE']
+REMOTE_CLOUD_HOSTED = secrets['REMOTE_CLOUD_HOSTED']
 
 if os.path.isfile('media_server.toml'):
     server_settings = toml.load('media_server.toml')
@@ -19,10 +20,20 @@ else:
     server_settings = toml.load('media_server.example.toml')
 
 MEDIA_SOURCES, MEDIA_TYPES = server_settings['MEDIA_SOURCES'], server_settings['MEDIA_TYPES']
-HOST = server_settings['CLOUD_HOST'] if RELEASE else server_settings['LOCAL_HOST']
+HOST = server_settings['CLOUD_HOST'] if REMOTE_CLOUD_HOSTED else server_settings['LOCAL_HOST']
 PORT = server_settings['PORT']
 
 CORS_ALLOW_ORIGINS = ['http://{HOST}, https://{HOST}, http://localhost, http://localhost:4010, http://localhost:8765']
+
+def _image_bytes(image):
+    with open(image, 'rb') as image_f:
+        image_bytes = image_f.read()
+    return image_bytes
+
+def _image_base64(image):
+    image_bytes = _image_bytes(image)
+    image_b64 = base64.b64encode(image_bytes).decode('utf-8')
+    return image_b64
 
 def _rename_file_with_prefix(source: str, media_file: str, prefix: str):
     media_source = MEDIA_SOURCES[source]
@@ -87,6 +98,21 @@ class MediaServerAPI_Wrapper(FastAPI):
         def home():
             return RedirectResponse(url='/docs', status_code=307)
 
+        @self.get("/media_full_path/{source}/{media_file}")
+        def media_full_path(source: str, media_file: str):
+            media_source = self.MEDIA_SOURCES[source]
+            media_folder = media_source['media_folder']
+
+            filename = os.path.join(media_folder, media_file)
+
+            if not os.path.isfile(filename):
+                return Response(status_code=404)
+
+            return JSONResponse(
+                {'media_full_path': filename},
+                status_code=200
+            )
+
         @self.get("/media/{source}/{media_file}")
         def media(source: str, media_file: str):
             media_source = MEDIA_SOURCES[source]
@@ -119,23 +145,46 @@ class MediaServerAPI_Wrapper(FastAPI):
                 status_code=200
             )
 
-        # TODO: https://thispointer.com/python-get-list-of-files-in-directory-sorted-by-date-and-time/
         @self.get("/media_list/{source}")
-        async def media_list(source: str, filter: Union[str, None] = None, sort: bool = False):
+        async def media_list(
+            source: str, 
+            filter_string: Union[str, None] = None, 
+            sort_flag: bool = False,
+            sort_by_date_flag: bool = True,
+            ascending: bool = False
+        ):
 
             source = source.replace('(', '').replace(')', '').replace('"', '').strip()
+
+            # https://thispointer.com/python-get-list-of-files-in-directory-sorted-by-date-and-time/
+            def _get_sorted(media_files):
+                
+                # sorted() sorts alphabetical + ascending by default
+                # With a date key it does an ascending date sort
+                # For descending (not ascending) we just reverse the list
+
+                def _media_file_date(x):
+                    return os.path.getmtime(x)
+
+                if sort_flag and sort_by_date_flag:
+                    media_files = sorted(media_files, key=_media_file_date, reverse=(not ascending))
+                elif sort_flag:
+                    media_files = sorted(media_files, reverse=(not ascending))
+
+                return media_files
 
             def _get_media_list():
                 media_source = MEDIA_SOURCES[source]
                 media_files = []
-                media_filter = filter if filter else media_source['media_filter']
+                media_filter = filter_string if filter_string else media_source['media_filter']
                 if media_source.get('media_folder', None):
                     media_folder = media_source['media_folder']
                     for media_type in MEDIA_TYPES:
                         file_extension = media_type.split('/')[-1]
-                        media_type_files = [url.replace(f'{media_folder}\\','') for url in glob.glob(f'{media_folder}/*.{file_extension}')]
+                        media_type_files = glob.glob(f'{media_folder}/*.{file_extension}')
                         media_files.extend(media_type_files)
-                    media_files = sorted(media_files) if sort else media_files
+                    media_files = _get_sorted(media_files)
+                    media_files = [url.replace(f'{media_folder}\\','').replace(f'{media_folder}/','') for url in media_files]
                 elif media_source.get('media_links', None):
                     media_files = media_source['media_links']
 
