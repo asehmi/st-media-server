@@ -18,11 +18,11 @@ This Streamlit app renders an image grid from images served from a simple `FastA
 
 ### Try the demo app yourself
 
-(_**WORK IN PROGRESS**_: [28 June 2022] Trying to get FastAPI to run in Streamlit Cloud.)
+Clone the repo and run it locally. Launching FastAPI in Streamlit Cloud hasn't worked for me due to port binding issues, so instead use a hosting service that supports custom servers and ports, or build a Docker image. There are a few Streamlit Docker templates around if you search the Streamlit discussion forum.
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](#)
+To deploy on Heroku you must configure a `Procfile` and `setup.sh`, and separate the frontend and backend deployments.
 
- Clone the repo and run it locally for the time being.
+However, if you prefer a monolithic pure Streamlit version of this application, then please see my [st-media-service](https://github.com/asehmi/st-media-service). (The really cool thing about FastAPI is that it's easy to rip it out leaving a Python object that can be used directly in a Python client application, which is how `st-media-service` came about.)
 
 ## Installation
 
@@ -53,10 +53,11 @@ Configure the server `CLOUD_HOST`, `LOCAL_HOST` and `PORT` in the server `toml` 
 # Set remote cloud hosted key to false for local machine deployments
 REMOTE_CLOUD_HOSTED = false
 
-# Assign the cloud media server host AFTER you know the deployment URL via management console
-# ( Can be '<user-repo-app-key>.herokuapp.com' too, if you configure
-#   'Procfile' and 'setup.sh', and separate the frontend and backend deployments )
-MEDIA_SERVER_CLOUD_HOST = '<user-repo-app-key>.streamlitapp.com'
+# Assign the cloud host AFTER you know the deployment URL
+# ( To deploy on Heroku you must configure a 'Procfile' and 'setup.sh',
+#   and separate the frontend and backend deployments. Launching FastAPI in
+#   Streamlit Cloud hasn't worked for me due to port binding issues. )
+MEDIA_SERVER_CLOUD_HOST = '<user-repo-app-key>.herokuapp.com'
 MEDIA_SERVER_LOCAL_HOST = 'localhost'
 MEDIA_SERVER_PORT = 8888
 
@@ -85,9 +86,10 @@ default_index = 4
 # Singular values come above the key group values below to prevent them combining
 
 # Assign the cloud host AFTER you know the deployment URL
-# ( Can be '<user-repo-app-key>.herokuapp.com' too, if you configure
-#   'Procfile' and 'setup.sh', and separate the frontend and backend deployments )
-CLOUD_HOST = '<user-repo-app-key>.streamlitapp.com'
+# ( To deploy on Heroku you must configure a 'Procfile' and 'setup.sh',
+#   and separate the frontend and backend deployments. Launching FastAPI in
+#   Streamlit Cloud hasn't worked for me due to port binding issues. )
+CLOUD_HOST = '<user-repo-app-key>.herokuapp.com'
 LOCAL_HOST = 'localhost'
 
 PORT = 8888
