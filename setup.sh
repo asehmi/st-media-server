@@ -13,7 +13,7 @@ echo "font = \"monospace\""  >> ~/.streamlit/config.toml
 echo "[runner]"  >> ~/.streamlit/config.toml
 echo "fastReruns = false"  >> ~/.streamlit/config.toml
 
-echo "REMOTE_CLOUD_HOSTED = true"  >> ~/.streamlit/secrets.toml
+echo "REMOTE_CLOUD_HOSTED = true"  > ~/.streamlit/secrets.toml
 echo "MEDIA_SERVER_CLOUD_HOST = 'st-media-server.herokuapp.com'"  >> ~/.streamlit/secrets.toml
 echo "MEDIA_SERVER_LOCAL_HOST = 'localhost'"  >> ~/.streamlit/secrets.toml
 echo "MEDIA_SERVER_PORT = $PORT"  >> ~/.streamlit/secrets.toml
