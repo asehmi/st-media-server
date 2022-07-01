@@ -1,1 +1,1 @@
-web: sh setup.sh && python media_server.py st-media-server.herokuapp.com 8888
+web: sh setup.sh && python media_server.py st-media-server.herokuapp.com $PORT
