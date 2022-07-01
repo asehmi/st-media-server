@@ -7,7 +7,7 @@
 CLOUD_HOST = 'st-media-server.herokuapp.com'
 LOCAL_HOST = 'localhost'
 
-PORT = $PORT
+PORT = 8888
 
 MEDIA_TYPES = [
     'image/jpg',
