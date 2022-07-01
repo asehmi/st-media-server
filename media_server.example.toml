@@ -4,7 +4,7 @@
 # ( To deploy on Heroku you must configure a 'Procfile' and 'setup.sh',
 #   and separate the frontend and backend deployments. Launching FastAPI in
 #   Streamlit Cloud hasn't worked for me due to port binding issues. )
-CLOUD_HOST = 'st-media-server.herokuapp.com'
+CLOUD_HOST = '<user-repo-app-key>.herokuapp.com'
 LOCAL_HOST = 'localhost'
 
 PORT = 8888

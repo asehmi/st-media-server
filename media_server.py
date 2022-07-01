@@ -1,3 +1,4 @@
+from imp import reload
 import os
 import sys
 from typing import Union
@@ -95,11 +96,11 @@ class MediaServerAPI_Wrapper(FastAPI):
         self.openapi = custom_openapi
         
         @self.get("/")
-        def home():
+        async def home():
             return RedirectResponse(url='/docs', status_code=307)
 
         @self.get("/media_full_path/{source}/{media_file}")
-        def media_full_path(source: str, media_file: str):
+        async def media_full_path(source: str, media_file: str):
             media_source = self.MEDIA_SOURCES[source]
             media_folder = media_source['media_folder']
 
@@ -114,7 +115,7 @@ class MediaServerAPI_Wrapper(FastAPI):
             )
 
         @self.get("/media/{source}/{media_file}")
-        def media(source: str, media_file: str):
+        async def media(source: str, media_file: str):
             media_source = MEDIA_SOURCES[source]
             media_folder = media_source['media_folder']
 
@@ -226,7 +227,7 @@ def start(host=HOST, port=PORT):
     try:
         import uvicorn
         from pathlib import Path
-        uvicorn.run(f'{Path(__file__).stem}:app', host=host, port=port, workers=2, reload=True)
+        uvicorn.run(f'{Path(__file__).stem}:app', host=host, port=port) # reload=True, workers=2
     except Exception as msg:
         print('EXCEPTION ecountered running uvicorn!')
         print(str(msg))
