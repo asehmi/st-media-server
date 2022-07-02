@@ -54,13 +54,48 @@ if 'IMG_W' not in state:
 
 if 'USE_PRESET' not in state:
     state.USE_PRESET = True
+if 'SCREEN_WIDTH_OPTIONS' not in state:
+    state.SCREEN_WIDTH_OPTIONS = st.secrets['DISPLAY_OPTIONS']['screen_widths']
+if 'SCREEN_WIDTH_DEFAULT' not in state:
+    state.SCREEN_WIDTH_DEFAULT = st.secrets['DISPLAY_OPTIONS']['default_screen_width']
+if 'NUM_COLS_OPTIONS' not in state:
+    state.NUM_COLS_OPTIONS = st.secrets['DISPLAY_OPTIONS']['num_columns']
 if 'PRESETS' not in state:
-    state.PRESETS = st.secrets['DISPLAY_PRESETS']['presets']
+    screen_width_options = st.secrets['DISPLAY_OPTIONS']['screen_widths']
+    num_columns_options = st.secrets['DISPLAY_OPTIONS']['num_columns']
+    all_computed_presets = {sw: {nc: str(int(int(sw)/int(nc))) for nc in num_columns_options} for sw in screen_width_options}
+    default_screen_width = st.secrets['DISPLAY_OPTIONS']['default_screen_width']
+    default_computed_presets = [f'{nc}, {cw}' for nc, cw in all_computed_presets[default_screen_width].items()]
+    state.PRESETS = default_computed_presets
 if 'PRESET_DEFAULT_INDEX' not in state:
-    state.PRESET_DEFAULT_INDEX = st.secrets['DISPLAY_PRESETS']['default_index']
+    num_columns_options = st.secrets['DISPLAY_OPTIONS']['num_columns']
+    default_num_columns = st.secrets['DISPLAY_OPTIONS']['default_num_columns']
+    default_num_columns_index = num_columns_options.index(default_num_columns)
+    state.PRESET_DEFAULT_INDEX = default_num_columns_index
 
 if 'SHOW_CAPTIONS' not in state:
     state.SHOW_CAPTIONS = False
+
+def test_compute_presets():
+    screen_width_options = st.secrets['DISPLAY_OPTIONS']['screen_widths']
+    num_columns_options = st.secrets['DISPLAY_OPTIONS']['num_columns']
+    all_computed_presets = {sw: {nc: str(int(int(sw)/int(nc))) for nc in num_columns_options} for sw in screen_width_options}
+    default_screen_width = st.secrets['DISPLAY_OPTIONS']['default_screen_width']
+    default_computed_presets = [f'{nc}, {cw}' for nc, cw in all_computed_presets[default_screen_width].items()]
+    default_num_columns = st.secrets['DISPLAY_OPTIONS']['default_num_columns']
+    default_num_columns_index = num_columns_options.index(default_num_columns)
+    default_preset = default_computed_presets[default_num_columns_index]
+
+    print('screen_width_options = ', screen_width_options)
+    print('num_columns_options = ', num_columns_options)
+    print('all_computed_presets = ', all_computed_presets)
+    print('default_screen_width = ', default_screen_width)
+    print('default_computed_presets = ', default_computed_presets)
+    print('default_num_columns = ', default_num_columns)
+    print('default_num_columns_index = ', default_num_columns_index)
+    print('default_preset = ', default_preset)
+
+# test_compute_presets()
 
 # --------------------------------------------------------------------------------
 
@@ -224,6 +259,16 @@ def _set_media_controls_cb():
 def _set_use_preset_cb():
     state.USE_PRESET = state['use_preset']
 
+def _set_screen_width_default_index_cb():
+    state.SCREEN_WIDTH_DEFAULT = state['screen_width_choice']
+
+    screen_width_options = st.secrets['DISPLAY_OPTIONS']['screen_widths']
+    num_columns_options = st.secrets['DISPLAY_OPTIONS']['num_columns']
+    all_computed_presets = {sw: {nc: str(int(int(sw)/int(nc))) for nc in num_columns_options} for sw in screen_width_options}
+    default_screen_width = state.SCREEN_WIDTH_DEFAULT
+    default_computed_presets = [f'{nc}, {cw}' for nc, cw in all_computed_presets[default_screen_width].items()]
+    state.PRESETS = default_computed_presets
+
 # Prevents double selecting to make widget state stick
 def _set_preset_default_index_cb():
     state.PRESET_DEFAULT_INDEX = state.PRESETS.index(state['preset_choice'])
@@ -267,6 +312,13 @@ def main():
         with st.expander('👀 Layout settings', expanded=True):
             state.USE_PRESET = st.checkbox('Show presets', state.USE_PRESET, on_change=_set_use_preset_cb, key='use_preset')
             if state.USE_PRESET:
+                st.selectbox(
+                    'What is your screen width?', options=state.SCREEN_WIDTH_OPTIONS,
+                    index=state.SCREEN_WIDTH_OPTIONS.index(state.SCREEN_WIDTH_DEFAULT),
+                    on_change=_set_screen_width_default_index_cb,
+                    help='Pixel width of your device, including compensation for scale factor',
+                    key='screen_width_choice'
+                )
                 preset_choice = st.selectbox(
                     'Choose a preset', options=state.PRESETS,
                     index=state.PRESET_DEFAULT_INDEX,
@@ -274,8 +326,8 @@ def main():
                     help='Number of columns and image width',
                     key='preset_choice'
                 )
-                state.NUM_COLS = int(preset_choice.split(',')[0])
-                state.IMG_W = int(preset_choice.split(',')[1])
+                state.NUM_COLS = int(preset_choice.split(',')[0].strip())
+                state.IMG_W = int(preset_choice.split(',')[1].strip())
             else:
                 state.NUM_COLS = st.number_input('Number columns', 1, 80, int(state.NUM_COLS), 1)
                 state.IMG_W = st.number_input('Image width', 32, 3200, int(state.IMG_W), 32)

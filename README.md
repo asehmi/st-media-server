@@ -45,7 +45,9 @@ The demo client app is easily customised.
 
 Media sources compatible with Streamlit's `st.image()` API are configured in `media_server.toml`. If this `toml` file isn't present the example `media_server.example.toml` is loaded instead. It should be obvious how to create your own server `toml` file. Note that two modes are supported, namely _local files_ (using the `media_folder` key) and _web links_ (using the `media_links` key). They are mutually exclusive and can't be intermixed.
 
-Configure the server `CLOUD_HOST`, `LOCAL_HOST` and `PORT` in the server `toml` file (used by `media_server.py`) and the equivalents in `.streamlit/secrets.toml` (used by `client_app.py`). Note, set `RELEASE` to `false` in `.streamlit/secrets.toml` for local machine deployments of the client and server solution.
+Configure the server `CLOUD_HOST`, `LOCAL_HOST` and `PORT` in the server `toml` file (used by `media_server.py`). You can also configure grid layout options in `.streamlit/secrets.toml` (used by `client_app.py`). There are options for screen width and the number of columns displayed. This data is used to generate various layout presets which are selectable in the UI. Since my screen width is 2560 pixels wide, I have set the default screen width to this value. You're free to change the display options to match your device screen resolution. (Note, you may need to account for any screen scaling factor you may have active, e.g. a 3840 wide screen with 175% scaling is effectively 2190 wide.)
+
+Note, set `REMOTE_CLOUD_HOSTED` to `false` in `.streamlit/secrets.toml` for local machine deployments of the client and server solution.
 
 **.streamlit/secrets.toml**
 
@@ -64,20 +66,20 @@ MEDIA_SERVER_PORT = 8888
 MAX_NUM_IMAGES = 3000
 DEFAULT_NUM_IMAGES = 1000
 
-# presets = Number of columns, Pixel width presets
-# default_index = index of default to start with
-[DISPLAY_PRESETS]
-presets = [
-    '1, 2560',
-    '2, 1280',
-    '3, 850',
-    '4, 640',
-    '5, 512',
-    '10, 256',
-    '20, 128',
-    '40, 64'
+# - layout presets are computed from these display options
+# - computed preset format = Number of columns, Pixel width
+# - the defaults indicate which layout to start with
+[DISPLAY_OPTIONS]
+screen_widths = [
+    '2560', '2190', '1920', '1680', '1600', '1440', '1400',
+    '1366', '1360', '1280', '1152', '1024', '800'
 ]
-default_index = 4
+default_screen_width = '2560'
+num_columns = [
+    '1', '2', '3', '4', '5', '8',
+    '10', '16', '20', '32', '40'
+]
+default_num_columns = '5'
 ```
 
 **media_server.toml**
