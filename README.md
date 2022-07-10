@@ -1,3 +1,5 @@
+<span style='font-weight: bold; color: crimson'>This application is deprecated. Please see <a href=' https://github.com/asehmi/media-explorer-app'>media-explorer-app</a>.</span>
+
 # FastAPI media server and Streamlit client app example
 
     date: "2022-06-30"
